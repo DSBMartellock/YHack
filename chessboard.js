@@ -15,7 +15,10 @@ const knight = {
 
 const highlightColor = '#523555';
 const visitedColor = '#222222';
+
 const lineColor = '#abcbca';
+const otherColor = "#797979";
+const basicColor = "#ffffff";
 
 /******************************************************************************
 ******************************************************************************/
@@ -28,7 +31,7 @@ function generateSquare() {
     // x1, y1, x2, y2
     position: [0, 0, 0, 0],
     visited: false,
-    color: '#ffffff'
+    color: basicColor
   };
 }
 
@@ -63,7 +66,7 @@ function preload() {
   img = loadImage("images/purpleknight.png");
 }
 function setup() {
-    canvas = createCanvas(minDim, minDim);
+    canvas = createCanvas(minDim + 1, minDim + 1);
     canvas.position(minDim/2 + 0.1 * minDim, 0.01 * minDim);
 
     // Set up the board
@@ -71,6 +74,9 @@ function setup() {
         let tempArray = [];
         for (let j = 0; j < 8; j++) {
             tempArray.push(generateSquare());
+            if ((i + j) % 2 == 1) {
+                tempArray[tempArray.length-1].color = otherColor;
+            }
         }
         squares.push(tempArray);
     }
@@ -79,6 +85,7 @@ function setup() {
 }
 
 function drawLines() {
+  strokeWeight(5);
   stroke(lineColor);
   for (let i = 0; i < lines.length; i++) {
       line(lines[i][0], lines[i][1], lines[i][2], lines[i][3]);
@@ -95,10 +102,11 @@ function draw() {
     if(possible_moves.length === 0) {
         fill('white');
         noStroke();
+        drawBoard();
         rect(0, 0, minDim, minDim);
         drawLines();
-        saveCanvas("images/canvas", "png")
-        remove();
+        saveCanvas("images/canvas", "png");
+        noLoop();
     }
 }
 
@@ -117,7 +125,8 @@ function mousePressed() {
 ******************************************************************************/
 
 function drawBoard() {
-  stroke(50);
+  strokeWeight(1);
+  stroke(0);
   const m = (1/8) * minDim;
   for (let col = 0; col < 8; col++) {
       for(let row = 0; row < 8; row ++) {
@@ -127,10 +136,9 @@ function drawBoard() {
                                         (row+1) * m, (col+1) * m];
       }
   }
-  // printSquares();
-
+  line(minDim, 0, minDim, minDim);
+  line(0, minDim, minDim, minDim);
 }
-
 
 function highlight(move_index) {
     const x1 = squares[move_index[0]][move_index[1]].position[0];

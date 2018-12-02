@@ -22,6 +22,7 @@ function preload() {
 
 function setup() {
   createCanvas(window.innerWidth * .99, window.innerHeight * .974);
+
   background(0);
 }
 
@@ -124,7 +125,7 @@ function draw() {
 
 function mousePressed() {
   if ((mouseX > 629) && (mouseX < 875) && (mouseY > 354) && (mouseY < 409)) {
-    (window.location = 'secondpage.html');
+    (window.location = 'playgame.html');
   }
   if ((mouseX > 625) && (mouseX < 875) && (mouseY > 440) && (mouseY < 495)) {
     (window.location = 'whatis.html');
