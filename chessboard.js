@@ -6,12 +6,17 @@ let minDim = Math.min(window.innerWidth, window.innerHeight) * .97;
 const squares = [];
 let possible_moves = [];
 let img;
+const lines = [];
 relative_moves = [[1, 2], [1,-2], [-1, 2], [-1, -2],
                   [2, -1], [2, 1], [-2, 1], [-2, -1]];
-
 const knight = {
   square_index: [0, 0]
 };
+
+const highlightColor = '#523555';
+const visitedColor = '#222222';
+const lineColor = '#abcbca';
+
 /******************************************************************************
 ******************************************************************************/
 
@@ -22,7 +27,8 @@ function generateSquare() {
   return {
     // x1, y1, x2, y2
     position: [0, 0, 0, 0],
-    visited: false
+    visited: false,
+    color: '#ffffff'
   };
 }
 
@@ -35,7 +41,7 @@ function getPossibleMoves() {
         y = knight.square_index[1] + relative_moves[i][1];
 
         // Prevent x, y values from being off-board
-        if (x > 8 || x < 0 || y > 7 || y < 0) {
+        if (x > 7 || x < 0 || y > 7 || y < 0) {
           continue;
         }
 
@@ -53,9 +59,10 @@ function getPossibleMoves() {
 /******************************************************************************
   p5.js lifecycle methods
 ******************************************************************************/
-
+function preload() {
+  img = loadImage("images/purpleknight.png");
+}
 function setup() {
-    img = loadImage("images/purpleknight.png");
     canvas = createCanvas(minDim, minDim);
     canvas.position(minDim/2 + 0.1 * minDim, 0.01 * minDim);
 
@@ -71,22 +78,35 @@ function setup() {
 
 }
 
+function drawLines() {
+  stroke(lineColor);
+  for (let i = 0; i < lines.length; i++) {
+      line(lines[i][0], lines[i][1], lines[i][2], lines[i][3]);
+  }
+}
+
 function draw() {
     background(220);
     drawBoard();
+    highlightPossibleMoves();
     drawKnight();
-    noLoop();
+    drawLines();
+
+    if(possible_moves.length === 0) {
+        fill('white');
+        noStroke();
+        rect(0, 0, minDim, minDim);
+        drawLines();
+        saveCanvas("images/canvas", "png")
+        remove();
+    }
 }
 
 function mousePressed() {
-   if (checkMembership(knight.square_index)) {
-     console.log("YES");
-      highlightPossibleMoves();
-   } else {
-      let mouseMembership = getMouseMembership();
-      if (mouseMembership.isPossibleMember)
-          moveKnight(mouseMembership.position);
-   }
+    let mouseMembership = getMouseMembership();
+    if (mouseMembership.isPossibleMember)
+        moveKnight(mouseMembership.position);
+
 }
 
 /******************************************************************************
@@ -98,10 +118,10 @@ function mousePressed() {
 
 function drawBoard() {
   stroke(50);
-  noFill();
   const m = (1/8) * minDim;
   for (let col = 0; col < 8; col++) {
       for(let row = 0; row < 8; row ++) {
+          fill(squares[row][col].color);
           rect(row * m, col * m, (row+1) * m, (col+1) * m);
           squares[row][col].position = [row * m, col * m,
                                         (row+1) * m, (col+1) * m];
@@ -118,20 +138,20 @@ function highlight(move_index) {
     const x2 = squares[move_index[0]][move_index[1]].position[2];
     const y2 = squares[move_index[0]][move_index[1]].position[3];
 
-    _printSquare(move_index[0], move_index[1]);
-    fill(256, 72, 31);
+    // _printSquare(move_index[0], move_index[1]);
+    fill(highlightColor);
     rect(x1, y1, x2-x1, y2-y1);
-
 }
 
 function highlightPossibleMoves() {
-  for (let i = 0; i < possible_moves.length; i++) {
-    console.log("moves = " + possible_moves[i][0]);
-    console.log("moves = " + possible_moves[i][1]);
-    // console.log(possible_moves[1]);
-    highlight(possible_moves[i]);
-  }
+    for (let i = 0; i < possible_moves.length; i++) {
+          // console.log("moves = " + possible_moves[i][0]);
+          // console.log("moves = " + possible_moves[i][1]);
+          // // console.log(possible_moves[1]);
+          highlight(possible_moves[i]);
+    }
 }
+
 
 function getMouseMembership() {
   // Returns what square mouse is in, and if its a valid move
@@ -177,23 +197,27 @@ function drawMovementLine(square_index) {
 
     const x_old = (x1 + x2)/2;
     const y_old = (y1 + y2)/2;
-
-    line(x_new, y_new, x_old, y_old);
+    lines.push([x_old, y_old, x_new, y_new]);
 }
+
 
 function drawKnight() {
     const x = knight.square_index[0];
     const y = knight.square_index[1];
     const origin = squares[x][y].position;
-    const size = origin[2] - origin[0];
+    const size = minDim/8;
     image(img, origin[0], origin[1], size, size);
 }
 
 function moveKnight(square_index) {
     squares[square_index[0]][square_index[1]].visited = true;
+    squares[square_index[0]][square_index[1]].color = visitedColor;
+
     drawMovementLine(square_index);
-    knight.position = square_index;
-    drawKnight();
+    knight.square_index = square_index;
+    possible_moves = getPossibleMoves();
+
+    redraw();
 }
 
 function checkMembership(position_index) {
@@ -208,7 +232,8 @@ function checkMembership(position_index) {
 
 
 function printSquares() {
-  for (let row = 0; row < 8; row++) {
+  for (let row = 0; row < 8; row++) {    squares[move_index[0]][move_index[1]].color = '#222222';
+
     for (let col = 0; col < 8; col++) {
       _printSquare(row, col);
     }
