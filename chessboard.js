@@ -74,8 +74,8 @@ function getPossibleMoves() {
   p5.js lifecycle methods
 ******************************************************************************/
 function preload() {
-  instructionsImg = loadImage("images/purpleknight.png");
-  img = loadImage("https://c1.staticflickr.com/5/4874/32268739068_3db4e07212_b.jpg");
+  instructionsImg = loadImage("images/instructions.png");
+  img = loadImage("images/purpleknight.png");
 
 }
 
@@ -111,40 +111,37 @@ function drawLines() {
 }
 
 function draw() {
-    if(showInstructions) {
-        image(instructionsImg, 0, 0)
-    } else {
-        background(220);
-        drawBoard();
-        highlightPossibleMoves();
-        drawKnight();
-        drawLines();
+      background(220);
+      drawBoard();
+      highlightPossibleMoves();
+      drawKnight();
+      drawLines();
 
-        if(possible_moves.length === 0) {
-            fill('white');
-            noStroke();
-            drawBoard();
-            rect(0, 0, minDim, minDim);
-            drawLines();
-            saveCanvas("images/canvas", "png");
-            noLoop();
-        }
-    }
-  
-  noStroke()
-  fill('#ffffff');
-  rect(minDim, 0, minDim * 11 / 10, minDim)
+      noStroke();
+      fill('#ffffff');
+      rect(minDim, 0, minDim * 11 / 10, minDim)
 
 
-  textSize(8);
-  stroke(255);
-  text('Home', 700, 125);
+      textSize(8);
+      stroke(255);
+      text('Home', 700, 125);
 
-  stroke(1);
-  fill('#AC6BD9');
-  rect(700, 150, 55, 55, 20, 15, 10, 5);
-  rect(700, 300, 55, 55, 20, 15, 10, 5);
-  rect(700, 450, 55, 55, 20, 15, 10, 5);
+      stroke(1);
+      fill('#AC6BD9');
+      rect(700, 150, 55, 55, 20, 15, 10, 5);
+      rect(700, 300, 55, 55, 20, 15, 10, 5);
+      rect(700, 450, 55, 55, 20, 15, 10, 5);
+
+      if(possible_moves.length === 0) {
+
+          noStroke();
+          drawBoard();
+          fill('white');
+          rect(0, 0, minDim * 11/10 - 2, minDim);
+          drawLines();
+          saveCanvas("images/canvas", "png");
+          noLoop();
+      }
 
 }
 
