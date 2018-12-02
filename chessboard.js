@@ -7,7 +7,7 @@ const squares = [];
 let possible_moves = [];
 let img;
 let instructionsImg;
-
+let undoTwice = true;
 const lines = [];
 relative_moves = [
   [1, 2],
@@ -31,6 +31,8 @@ const lineColor = '#AC6BD9';
 const otherColor = "#91A6DB";
 const basicColor = "#ffffff";
 
+const undoLines = [];
+
 /******************************************************************************
  ******************************************************************************/
 
@@ -42,7 +44,8 @@ function generateSquare() {
     // x1, y1, x2, y2
     position: [0, 0, 0, 0],
     visited: false,
-    color: basicColor
+    color: basicColor,
+    previousColor: basicColor
   };
 }
 
@@ -82,7 +85,11 @@ function preload() {
 function setup() {
   canvas = createCanvas(minDim + minDim / 10, minDim + 1);
   canvas.position(minDim / 2 + 0.1 * minDim, 0.01 * minDim);
+  let img1 = document.getElementById("reset");
+  img1.addEventListener('click', reload);
 
+  // let img2 = document.getElementById("undo");
+  // img2.addEventListener('click', undo);
 
   // Set up the board
   for (let i = 0; i < 8; i++) {
@@ -91,11 +98,13 @@ function setup() {
       tempArray.push(generateSquare());
       if ((i + j) % 2 == 1) {
         tempArray[tempArray.length - 1].color = otherColor;
+        tempArray[tempArray.length - 1].previousColor = otherColor;
       }
     }
     squares.push(tempArray);
   }
 
+  undoLines.push(squares[0][0]);
   squares[0][0].visited = true;
   squares[0][0].color = visitedColor;
   possible_moves = getPossibleMoves();
@@ -119,21 +128,21 @@ function draw() {
 
       noStroke();
       fill('#ffffff');
-      rect(minDim, 0, minDim * 11 / 10, minDim)
+      rect(minDim, 0, minDim * 11 / 10, minDim);
 
-
-      textSize(8);
-      stroke(255);
-      text('Home', 700, 125);
-
-      stroke(1);
-      fill('#AC6BD9');
-      rect(700, 150, 55, 55, 20, 15, 10, 5);
-      rect(700, 300, 55, 55, 20, 15, 10, 5);
-      rect(700, 450, 55, 55, 20, 15, 10, 5);
+      //
+      //
+      // textSize(8);
+      // stroke(255);
+      // text('Home', 700, 125);
+      //
+      // stroke(1);
+      // fill('#AC6BD9');
+      // rect(700, 150, 55, 55, 20, 15, 10, 5);
+      // rect(700, 300, 55, 55, 20, 15, 10, 5);
+      // rect(700, 450, 55, 55, 20, 15, 10, 5);
 
       if(possible_moves.length === 0) {
-
           noStroke();
           drawBoard();
           fill('white');
@@ -142,17 +151,20 @@ function draw() {
           saveCanvas("images/canvas", "png");
           noLoop();
       }
-
 }
 
-
+function reload() {
+    location.reload(true);
+}
 
 function mousePressed() {
     if (showInstructions) {
         showInstructions = false;
     }
+
     let mouseMembership = getMouseMembership();
     if (mouseMembership.isPossibleMember)
+        undoTwice = true;
         moveKnight(mouseMembership.position);
 
 }
@@ -253,8 +265,38 @@ function drawMovementLine(square_index) {
   const x_old = (x1 + x2) / 2;
   const y_old = (y1 + y2) / 2;
   lines.push([x_old, y_old, x_new, y_new]);
+  undoLines.push(square_index);
 }
 
+function undo() {
+    // Get previous index
+    if (undoTwice) {
+        if (undoLines.length === 0) {
+            return;
+        }
+        undoTwice = false;
+    }
+
+    undoLines.pop();
+    if (undoLines.length === 0) {
+       return;
+    }
+
+    let lastIndex = undoLines.pop();
+
+    console.log(lastIndex);
+
+    // Pop from lines so new lines dont color
+    lines.pop();
+
+    // Restore latest square's colo
+    squares[knight.square_index[0]][knight.square_index[1]].visited = false;
+    squares[knight.square_index[0]][knight.square_index[1]].color =
+          squares[knight.square_index[0]][knight.square_index[1]].previousColor;
+
+    knight.square_index = lastIndex;
+    possible_moves = getPossibleMoves();
+}
 
 function drawKnight() {
   const x = knight.square_index[0];
