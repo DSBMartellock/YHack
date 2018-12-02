@@ -5,6 +5,7 @@ let canvas;
 let minDim = Math.min(window.innerWidth, window.innerHeight) * .97;
 const squares = [];
 let possible_moves = [];
+let img;
 relative_moves = [[1, 2], [1,-2], [-1, 2], [-1, -2],
                   [2, -1], [2, 1], [-2, 1], [-2, -1]];
 
@@ -54,6 +55,7 @@ function getPossibleMoves() {
 ******************************************************************************/
 
 function setup() {
+    img = loadImage("images/purpleknight.png");
     canvas = createCanvas(minDim, minDim);
     canvas.position(minDim/2 + 0.1 * minDim, 0.01 * minDim);
 
@@ -73,7 +75,7 @@ function draw() {
     background(220);
     drawBoard();
     noLoop();
-    // drawKnight();
+    drawKnight();
 }
 
 function mousePressed() {
@@ -177,6 +179,12 @@ function drawMovementLine(square_index) {
     const y_old = (y1 + y2)/2;
 
     line(x_new, y_new, x_old, y_old);
+}
+
+function drawKnight() {
+    const x = knight.square_index[0];
+    const y = knight.square_index[1];
+    image(img, x, y, )
 }
 
 function moveKnight(square_index) {
