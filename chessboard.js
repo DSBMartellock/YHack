@@ -6,6 +6,8 @@ let minDim = Math.min(window.innerWidth, window.innerHeight) * .97;
 const squares = [];
 let possible_moves = [];
 let img;
+let instructionsImg;
+
 const lines = [];
 relative_moves = [[1, 2], [1,-2], [-1, 2], [-1, -2],
                   [2, -1], [2, 1], [-2, 1], [-2, -1]];
@@ -13,6 +15,7 @@ const knight = {
   square_index: [0, 0]
 };
 
+let showInstructions = true;
 const highlightColor = '#523555';
 const visitedColor = '#222222';
 
@@ -64,6 +67,7 @@ function getPossibleMoves() {
 ******************************************************************************/
 function preload() {
   img = loadImage("images/purpleknight.png");
+  instructionsImg = loadImage("images/purpleknight.png");
 }
 function setup() {
     canvas = createCanvas(minDim + 1, minDim + 1);
@@ -74,7 +78,7 @@ function setup() {
         let tempArray = [];
         for (let j = 0; j < 8; j++) {
             tempArray.push(generateSquare());
-            if ((i + j) % 2 == 1) {
+            if ((i + j) % 2 === 1) {
                 tempArray[tempArray.length-1].color = otherColor;
             }
         }
@@ -93,24 +97,31 @@ function drawLines() {
 }
 
 function draw() {
-    background(220);
-    drawBoard();
-    highlightPossibleMoves();
-    drawKnight();
-    drawLines();
-
-    if(possible_moves.length === 0) {
-        fill('white');
-        noStroke();
+    if(showInstructions) {
+        image(instructionsImg, 0, 0)
+    } else {
+        background(220);
         drawBoard();
-        rect(0, 0, minDim, minDim);
+        highlightPossibleMoves();
+        drawKnight();
         drawLines();
-        saveCanvas("images/canvas", "png");
-        noLoop();
+
+        if(possible_moves.length === 0) {
+            fill('white');
+            noStroke();
+            drawBoard();
+            rect(0, 0, minDim, minDim);
+            drawLines();
+            saveCanvas("images/canvas", "png");
+            noLoop();
+        }
     }
 }
 
 function mousePressed() {
+    if (showInstructions) {
+        showInstructions = false;
+    }
     let mouseMembership = getMouseMembership();
     if (mouseMembership.isPossibleMember)
         moveKnight(mouseMembership.position);
