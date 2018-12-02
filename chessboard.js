@@ -72,6 +72,7 @@ function getPossibleMoves() {
 ******************************************************************************/
 function preload() {
   img = loadImage("https://c1.staticflickr.com/5/4874/32268739068_3db4e07212_b.jpg");
+
 }
 
 function setup() {
@@ -127,6 +128,11 @@ function draw() {
   noStroke()
   fill('#ffffff');
   rect(minDim, 0, minDim * 11 / 10, minDim)
+
+
+  textSize(8);
+  stroke(255);
+  text('Home', 700, 125);
 
   stroke(1);
   fill('#AC6BD9');
