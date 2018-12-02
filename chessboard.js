@@ -74,8 +74,8 @@ function setup() {
 function draw() {
     background(220);
     drawBoard();
-    noLoop();
     drawKnight();
+    noLoop();
 }
 
 function mousePressed() {
@@ -184,7 +184,9 @@ function drawMovementLine(square_index) {
 function drawKnight() {
     const x = knight.square_index[0];
     const y = knight.square_index[1];
-    image(img, x, y, )
+    const origin = squares[x][y].position;
+    const size = origin[2] - origin[0];
+    image(img, origin[0], origin[1], size, size);
 }
 
 function moveKnight(square_index) {
